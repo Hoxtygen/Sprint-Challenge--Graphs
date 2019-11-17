@@ -21,8 +21,44 @@ player = Player("Name", world.startingRoom)
 
 
 # FILL THIS IN
-traversalPath = ['n', 's']
+# traversalPath = ['n', 's']
 
+traversalPath = []
+visited = {}
+reverse = []
+room_exits = player.currentRoom.getExits()
+visited[player.currentRoom.id] = {room_exits[i]: '?' for i in range(0, len(room_exits))}
+
+
+
+
+while len(visited) < len(roomGraph) - 1:
+    if player.currentRoom.id not in visited:
+        room_exits = player.currentRoom.getExits()
+        visited[player.currentRoom.id] = { room_exits[i]: '?' for i in range(0, len(room_exits)) }
+        visited[player.currentRoom.id][reverse[-1]] = player.currentRoom.getRoomInDirection(reverse[-1])
+
+    current_exit = []
+    for exit_path, room in visited[player.currentRoom.id].items():
+        if room == '?': current_exit.append(exit_path)
+
+    while len(current_exit) == 0 and len(reverse) > 0:
+        reversed_direction = reverse.pop()
+        traversalPath.append(reversed_direction)
+        player.travel(reversed_direction)
+        new_exits = []
+        for exit_path, room in visited[player.currentRoom.id].items():
+            if room == '?':
+                new_exits.append(exit_path)
+        current_exit = new_exits
+
+    visited[player.currentRoom.id][current_exit[-1]
+                                   ] = player.currentRoom.getRoomInDirection(current_exit[-1])
+    move = current_exit.pop()
+    traversalPath.append(move)
+    opposites = {'n': 's', 's': 'n', 'e': 'w', 'w': 'e'}
+    reverse.append(opposites[move])
+    player.travel(move)
 
 # TRAVERSAL TEST
 visited_rooms = set()
